@@ -1,5 +1,5 @@
 # Simple Clipboard manager
-A very simple and minimal clipboard manager written in C and gtk4, that one thing
+A very simple and minimal clipboard manager written in C and gtk4, that does one thing
 and one thing well.
 
 ## Build instructions
@@ -12,7 +12,7 @@ Ensure meson, bear and gcc are setup on your system
     - If you only need to run the binary:
         ```
         cd build/
-        bear -- meson compile
+        meson compile
         ```
 
     - But to ensure that LSP's work correctly, generate compilation cache:
