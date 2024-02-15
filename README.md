@@ -1,9 +1,9 @@
 # Simple Clipboard manager
-A very simple and minimal clipboard manager written in C and gtk4, that does one thing
-and one thing well.
+A very simple and minimal clipboard manager written in C and gtk4 for Linux, that does one thing
+and one thing well. Relies on xclip to modify system clipboard.
 
 ## Build instructions
-Ensure meson, bear and gcc are setup on your system
+Ensure `meson`, `bear` and `gcc` are setup on your system
 
 - Setup build directory
     ```meson setup build```
