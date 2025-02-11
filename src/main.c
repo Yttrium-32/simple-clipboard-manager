@@ -1,44 +1,66 @@
-#include <gtk/gtk.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-static void copy_hello(GtkWidget *widget, gpointer data) {
-  g_print("\'Hello World\' copied to clipboard\n");
-  system("echo -n \"Hello World\" | xclip -sel c");
+typedef enum {
+    PRIMARY,
+    SECONDARY,
+    CLIPBOARD
+} Sel;
+
+// Reallocate or die
+void* xrealloc(void* ptr, size_t ptr_size) {
+    void* tmp = realloc(ptr, ptr_size);
+    if (tmp == NULL) {
+        // Realloc failed, kill program
+        free(ptr);
+        exit(EXIT_FAILURE);
+    }
+    else
+        return tmp;
 }
 
-static void activate(GtkApplication *app, gpointer user_data){
-  GtkWidget *window;
-  GtkWidget *button;
-  GtkWidget *box;
+char* retrieve_selection(Sel sel) {
+    char* cmd;
 
-  window = gtk_application_window_new(app);
-  gtk_window_set_title(GTK_WINDOW(window), "Window");
-  gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
+    switch (sel) {
+        case PRIMARY:
+            cmd = "xclip -selection p -o";
+            break;
+        case SECONDARY:
+            cmd = "xclip -selection s -o";
+            break;
+        case CLIPBOARD:
+        default:
+            cmd = "xclip -selection c -o";
+    }
+    char buffer;
+    char *buf = NULL;
+    size_t out_size = 0;
+    int last_idx = 0;
 
-  box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
-  gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+    FILE* fp = popen(cmd, "r");
 
-  gtk_window_set_child(GTK_WINDOW(window), box);
+    // Listen indefinitely for characters until EOF
+    while ((buffer = getc(fp)) != EOF) {
+        // The size of buffer required to hold text
+        out_size += sizeof(char);
 
-  button = gtk_button_new_with_label("Hello World");
+        // Allocate space for the new character
+        buf = xrealloc(buf, out_size);
 
-  g_signal_connect(button, "clicked", G_CALLBACK(copy_hello), NULL);
+        buf[last_idx++] = buffer;
+    }
 
-  gtk_box_append(GTK_BOX(box), button);
-
-  gtk_window_present(GTK_WINDOW(window));
+    // Strings are always null terminated
+    buf[last_idx] = '\0';
+    return buf;
 }
 
-int main(int argc, char **argv) {
-  GtkApplication *app;
-  int status;
+int main(void) {
+    Sel sel = CLIPBOARD;
+    char *out = retrieve_selection(sel);
 
-  app = gtk_application_new("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
-  g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
-  status = g_application_run(G_APPLICATION(app), argc, argv);
-  g_object_unref(app);
-  
-  return status;
+    puts(out);
+
+    return 0;
 }
-
