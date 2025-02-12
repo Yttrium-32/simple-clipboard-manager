@@ -56,6 +56,26 @@ char* retrieve_selection(Sel sel) {
     return buf;
 }
 
+void write_selection(Sel sel, const char* str) {
+    char* cmd;
+
+    switch (sel) {
+        case PRIMARY:
+            asprintf(&cmd, "echo -n %s | xclip -selection p", str);
+            break;
+        case SECONDARY:
+            asprintf(&cmd, "echo -n %s | xclip -selection s", str);
+            break;
+        case CLIPBOARD:
+        default:
+            asprintf(&cmd, "echo -n %s | xclip -selection c", str);
+    }
+
+    if (system(cmd) != 0) {
+        perror("Write to selection failed!");
+    };
+}
+
 int main(void) {
     Sel sel = CLIPBOARD;
     char *out = retrieve_selection(sel);
