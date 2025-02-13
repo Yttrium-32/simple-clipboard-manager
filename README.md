@@ -5,27 +5,17 @@ and one thing well. Relies on `xclip` to modify system clipboard.
 ## Build instructions
 Ensure `xclip`, `meson`, `bear` and `gcc` are setup on your system
 
-- Setup build directory:
-    ```meson setup build```
-
 - Building binary:
     - If you only need to run the binary:
         ```
-        cd build/
-        meson compile
+        make run
         ```
 
     - But to ensure that LSP's work correctly, generate compilation cache:
         ```
-        cd build/
-        bear -- meson compile
+        bear -- make
         ```
 
 - Run the binary:
   ```./build/clipboard-manager```
-
-
-
-
-
 
