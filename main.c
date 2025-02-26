@@ -8,7 +8,11 @@
 #include <stdio.h>
 
 int main(void) {
-    printf("Hello world!");
+    Sel sel = CLIPBOARD;
+    char *out = retrieve_selection(sel);
+
+    puts(out);
+
     return 0;
 }
 

@@ -70,11 +70,3 @@ void write_selection(Sel sel, const char* str) {
     };
 }
 
-int main(void) {
-    Sel sel = CLIPBOARD;
-    char *out = retrieve_selection(sel);
-
-    puts(out);
-
-    return 0;
-}
