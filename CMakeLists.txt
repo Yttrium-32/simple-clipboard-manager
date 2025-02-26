@@ -16,7 +16,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(raylib)
 
-add_executable(clipboard_manager main.c)
+add_executable(clipboard_manager main.c clip.c)
 
 target_compile_options(clipboard_manager PUBLIC)
 target_include_directories(clipboard_manager PUBLIC .)
