@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "clip.h"
 
@@ -12,6 +13,17 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         exit(EXIT_FAILURE);
     } else
         return tmp;
+}
+
+void append(char*** arr, char* data, size_t* arr_len, size_t data_len) {
+    *arr = xrealloc(*arr, (*arr_len + 1) * sizeof(char*));
+    (*arr)[*arr_len] = strdup(data);
+    if (!(*arr)[*arr_len]) {
+        perror("Failed to copy text!");
+        exit(EXIT_FAILURE);
+    }
+
+    (*arr_len)++;
 }
 
 char* retrieve_selection(Sel sel) {
