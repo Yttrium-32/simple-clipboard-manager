@@ -27,27 +27,29 @@ char* retrieve_selection(Sel sel) {
         default:
             cmd = "xclip -selection c -o";
     }
-    char buffer;
-    char *buf = NULL;
+    int ch;
+    char *char_buf = NULL;
     size_t out_size = 0;
     int last_idx = 0;
 
     FILE* fp = popen(cmd, "r");
 
     // Listen indefinitely for characters until EOF
-    while ((buffer = getc(fp)) != EOF) {
+    while ((ch = getc(fp)) != EOF) {
         // The size of buffer required to hold text
-        out_size += sizeof(char);
+        out_size++;
 
         // Allocate space for the new character
-        buf = xrealloc(buf, out_size);
+        char_buf = xrealloc(char_buf, out_size);
 
-        buf[last_idx++] = buffer;
+        char_buf[last_idx++] = ch;
     }
 
     // Strings are always null terminated
-    buf[last_idx] = '\0';
-    return buf;
+    // Allocate space for \0
+    char_buf = xrealloc(char_buf, out_size + 1);
+    char_buf[last_idx] = '\0';
+    return char_buf;
 }
 
 void write_selection(Sel sel, const char* str) {
