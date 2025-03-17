@@ -10,7 +10,8 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         // Realloc failed, kill program
         free(ptr);
         exit(EXIT_FAILURE);
-    } else return tmp;
+    } else
+        return tmp;
 }
 
 char* retrieve_selection(Sel sel) {
