@@ -62,8 +62,14 @@ int main(void) {
             append(&(clipboard.data), new_clip_data,
                    &(clipboard.len), new_clip_data_len);
 
-        for (size_t i = 0; i < clipboard.len; i++)
-            printf("%s\n", clipboard.data[i]);
+        for (size_t i = 0; i < clipboard.len; i++) {
+            if (!clipboard.data[i]) {
+                printf("Error: clipboard.data[%zu] is NULL\n", i);
+                continue;
+            }
+            printf("Data %zu: %s\n", i, clipboard.data[i]);
+        }
+        printf("----------------------------------------------------------------> End of clipboard\n");
 
         EndDrawing();
     }
