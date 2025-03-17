@@ -1,5 +1,6 @@
 #include "raylib/raylib.h"
 #include "clip.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -17,6 +18,12 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 }
 
 int main(void) {
+    Sel sel = CLIPBOARD;
+    Clipboard clipboard = {
+        .data = NULL,
+        .len = 0
+    };
+
     Clay_Raylib_Initialize(ScreenWidth, ScreenHeight, "Simple Clipboard Manager", 0);
 
     uint64_t clay_mem_size = Clay_MinMemorySize();
@@ -38,13 +45,28 @@ int main(void) {
         BeginDrawing();
         ClearBackground(YELLOW);
 
+        // Retrieve data from selection and check if it already exists in clipboard
+        char *new_clip_data = retrieve_selection(sel);
+        size_t new_clip_data_len = strlen(new_clip_data);
+        bool data_exists = false;
+        for (size_t i = 0; i < clipboard.len; i++ ) {
+            if (strlen(clipboard.data[i]) == new_clip_data_len &&
+                strncmp(clipboard.data[i], new_clip_data, new_clip_data_len) == 0) {
+                    data_exists = true;
+                    break;
+            }
+        }
+
+        // If data doesn't already exist add it clipboard
+        if (!data_exists)
+            append(&(clipboard.data), new_clip_data,
+                   &(clipboard.len), new_clip_data_len);
+
+        for (size_t i = 0; i < clipboard.len; i++)
+            printf("%s\n", clipboard.data[i]);
+
         EndDrawing();
     }
-    /*Sel sel = CLIPBOARD;*/
-    /*char *out = retrieve_selection(sel);*/
-
-    /*puts(out);*/
-
-    /*return 0*/;
+    return 0;
 }
 
