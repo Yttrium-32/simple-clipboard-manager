@@ -41,10 +41,29 @@ int main(void) {
     };
 
     Clay_Initialize(mem_arena, dimension, (Clay_ErrorHandler) { HandleClayErrors });
+
+    Font fonts[1];
+    fonts[0] = LoadFont("resources/Metropolis Light.ttf");
+    SetTextureFilter(fonts[0].texture, TEXTURE_FILTER_BILINEAR);
+
     SetTargetFPS(30);
 
     // main app loop
     while (!WindowShouldClose()) {
+        Clay_BeginLayout();
+        CLAY({
+                .id = CLAY_ID("MainContent"),
+                .layout = {
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .padding = {16, 16, 16, 16},
+                    .childGap = 16,
+                    .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) }
+                },
+                .backgroundColor = {18, 18, 18, 255},
+                .scroll = { .vertical = true }
+        }) {}
+        Clay_RenderCommandArray render_commands = Clay_EndLayout();
+
         BeginDrawing();
         ClearBackground(YELLOW);
 
@@ -75,6 +94,7 @@ int main(void) {
         }
         printf("----------------------------------------------------------------> End of clipboard\n");
 
+        Clay_Raylib_Render(render_commands, fonts);
         EndDrawing();
     }
     return 0;
