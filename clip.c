@@ -1,6 +1,10 @@
+#define _GNU_SOURCE
+
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "clip.h"
 
@@ -15,15 +19,31 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         return tmp;
 }
 
-void append(char*** arr, char* data, size_t* arr_len, size_t data_len) {
-    *arr = xrealloc(*arr, (*arr_len + 1) * sizeof(char*));
-    (*arr)[*arr_len] = strdup(data);
-    if (!(*arr)[*arr_len]) {
-        perror("Failed to copy text!");
-        exit(EXIT_FAILURE);
+int clipboard_append(Clipboard* clipboard, char* data, size_t data_len) {
+    // TODO: delete last item and move everything forward by one
+    if (clipboard->length >= clipboard->capacity) {
+        perror("Clipboard limit exceeded!");
+        return 1;
     }
 
-    (*arr_len)++;
+    char* new_string = strndup(data, data_len);
+    if (new_string == NULL) {
+        perror("Failed to copy string!");
+        return 1;
+    }
+
+    clipboard->data[clipboard->length] = new_string;
+    clipboard->length++;
+    return 0;
+}
+
+char* clipboard_get(Clipboard clipboard, size_t index) {
+    if (index >= 0 && index < clipboard.length) {
+        return clipboard.data[index];
+    }
+
+    raise(SIGTRAP);
+    return "\0";
 }
 
 char* retrieve_selection(Sel sel) {
@@ -40,10 +60,11 @@ char* retrieve_selection(Sel sel) {
         default:
             cmd = "xclip -selection c -o";
     }
-    int ch;
+
+    int32_t ch;
     char *char_buf = NULL;
     size_t out_size = 0;
-    int last_idx = 0;
+    int32_t last_idx = 0;
 
     FILE* fp = popen(cmd, "r");
 

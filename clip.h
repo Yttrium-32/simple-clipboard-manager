@@ -11,12 +11,14 @@ typedef enum {
 
 typedef struct {
     char** data;
-    size_t len;
+    size_t length;
+    size_t capacity;
 } Clipboard;
 
 void* xrealloc(void* ptr, size_t ptr_size);
 char* retrieve_selection(Sel sel);
 void write_selection(Sel sel, const char* str);
-void append(char*** arr, char* data, size_t* arr_len, size_t data_len);
+int clipboard_append(Clipboard* clipboard, char* data, size_t data_len);
+char* clipboard_get(Clipboard clipboard, size_t index);
 
 #endif // CLIP_H
