@@ -19,20 +19,31 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         return tmp;
 }
 
-int clipboard_append(Clipboard* clipboard, char* data, size_t data_len) {
-    // TODO: delete last item and move everything forward by one
-    if (clipboard->length >= clipboard->capacity) {
-        perror("Clipboard limit exceeded!");
-        return 1;
-    }
-
+char* copy_string(char* data, size_t data_len) {
     char* new_string = strndup(data, data_len);
     if (new_string == NULL) {
         perror("Failed to copy string!");
-        return 1;
+        exit(EXIT_FAILURE);
+    }
+    return new_string;
+}
+
+void clipboard_print(Clipboard clipboard) {
+    for (size_t i = 0; i < clipboard.length;i++)
+        printf("%s\n", clipboard.data[i]);
+    printf("-----------------End of clipboard;\n\n");
+}
+ 
+int clipboard_append(Clipboard* clipboard, char* data, size_t data_len) {
+    if (clipboard->length >= clipboard->capacity) {
+        for (size_t i = 0; i < clipboard->capacity - 1; i++)
+            clipboard->data[i] = clipboard_get(*clipboard, i + 1);
+
+        clipboard->data[clipboard->length - 1] = copy_string(data, data_len);
+        return 0;
     }
 
-    clipboard->data[clipboard->length] = new_string;
+    clipboard->data[clipboard->length] = copy_string(data, data_len);
     clipboard->length++;
     return 0;
 }
