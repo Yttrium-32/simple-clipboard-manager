@@ -20,7 +20,7 @@ void HandleClayErrors(Clay_ErrorData errorData) {
 int main(void) {
     Sel sel = CLIPBOARD;
 
-    char* clip_buffer[256] = {NULL};
+    String* clip_buffer[256] = {NULL};
     Clipboard clipboard = {
         .data = clip_buffer,
         .length = 0,
@@ -68,14 +68,14 @@ int main(void) {
         ClearBackground(YELLOW);
 
         // Retrieve data from selection and check if it already exists in clipboard
-        char *new_clip_data = retrieve_selection(sel);
-        size_t new_clip_data_len = strlen(new_clip_data);
+        String* new_clip_data = retrieve_selection(sel);
+
         bool data_exists = false;
         for (size_t i = 0; i < clipboard.length; i++ ) {
-            char* cur_clip_data = clipboard_get(clipboard, i);
+            String* cur_clip_data = clipboard_get(clipboard, i);
 
-            if (strlen(cur_clip_data) == new_clip_data_len &&
-                strncmp(cur_clip_data, new_clip_data, new_clip_data_len) == 0) {
+            if (cur_clip_data->length == new_clip_data->length &&
+                strncmp(cur_clip_data->chars, new_clip_data->chars, new_clip_data->length) == 0) {
                     data_exists = true;
                     break;
             }
@@ -83,16 +83,9 @@ int main(void) {
 
         // If data doesn't already exist add it clipboard
         if (!data_exists)
-            clipboard_append(&clipboard, new_clip_data, new_clip_data_len);
+            clipboard_append(&clipboard, new_clip_data);
 
-        for (size_t i = 0; i < clipboard.length; i++) {
-            if (!clipboard.data[i]) {
-                printf("Error: clipboard.data[%zu] is NULL\n", i);
-                continue;
-            }
-            printf("Data %zu: %s\n", i, clipboard.data[i]);
-        }
-        printf("----------------------------------------------------------------> End of clipboard\n");
+        clipboard_print(clipboard);
 
         Clay_Raylib_Render(render_commands, fonts);
         EndDrawing();

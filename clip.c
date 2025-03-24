@@ -19,45 +19,49 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         return tmp;
 }
 
-char* copy_string(char* data, size_t data_len) {
-    char* new_string = strndup(data, data_len);
-    if (new_string == NULL) {
-        perror("Failed to copy string!");
-        exit(EXIT_FAILURE);
-    }
+String* copy_string(String string) {
+    String* new_string = (String*)malloc(sizeof(String));
+
+    *new_string = (String) {
+        .chars = malloc(string.length),
+        .length = string.length
+    };
+
+    strncpy(new_string->chars, string.chars, string.length);
+
     return new_string;
 }
 
 void clipboard_print(Clipboard clipboard) {
     for (size_t i = 0; i < clipboard.length;i++)
-        printf("%s\n", clipboard.data[i]);
+        printf("%zu:\t%.*s\n", i, (int)clipboard.data[i]->length, clipboard.data[i]->chars);
     printf("-----------------End of clipboard;\n\n");
 }
  
-int clipboard_append(Clipboard* clipboard, char* data, size_t data_len) {
+int clipboard_append(Clipboard* clipboard, String* data) {
     if (clipboard->length >= clipboard->capacity) {
         for (size_t i = 0; i < clipboard->capacity - 1; i++)
             clipboard->data[i] = clipboard_get(*clipboard, i + 1);
 
-        clipboard->data[clipboard->length - 1] = copy_string(data, data_len);
+        clipboard->data[clipboard->length - 1] = copy_string(*data);
         return 0;
     }
 
-    clipboard->data[clipboard->length] = copy_string(data, data_len);
+    clipboard->data[clipboard->length] = copy_string(*data);
     clipboard->length++;
     return 0;
 }
 
-char* clipboard_get(Clipboard clipboard, size_t index) {
+String* clipboard_get(Clipboard clipboard, size_t index) {
     if (index >= 0 && index < clipboard.length) {
         return clipboard.data[index];
     }
 
     raise(SIGTRAP);
-    return "\0";
+    return (String*)NULL;
 }
 
-char* retrieve_selection(Sel sel) {
+String* retrieve_selection(Sel sel) {
     char* cmd;
 
     switch (sel) {
@@ -72,28 +76,29 @@ char* retrieve_selection(Sel sel) {
             cmd = "xclip -selection c -o";
     }
 
-    int32_t ch;
-    char *char_buf = NULL;
-    size_t out_size = 0;
+    String* char_buf = malloc(sizeof(String));
+    *char_buf = (String){
+        .chars = NULL,
+        .length = 0
+    };
+
+    /*char *char_buf = NULL;*/
+    /*size_t out_size = 0;*/
     int32_t last_idx = 0;
 
     FILE* fp = popen(cmd, "r");
 
     // Listen indefinitely for characters until EOF
+    int32_t ch;
     while ((ch = getc(fp)) != EOF) {
-        // The size of buffer required to hold text
-        out_size++;
+        char_buf->length++;
 
         // Allocate space for the new character
-        char_buf = xrealloc(char_buf, out_size);
+        char_buf->chars = xrealloc(char_buf->chars, char_buf->length);
 
-        char_buf[last_idx++] = ch;
+        char_buf->chars[last_idx++] = ch;
     }
 
-    // Strings are always null terminated
-    // Allocate space for \0
-    char_buf = xrealloc(char_buf, out_size + 1);
-    char_buf[last_idx] = '\0';
     return char_buf;
 }
 
