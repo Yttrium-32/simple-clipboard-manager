@@ -82,8 +82,6 @@ String* retrieve_selection(Sel sel) {
         .length = 0
     };
 
-    /*char *char_buf = NULL;*/
-    /*size_t out_size = 0;*/
     int32_t last_idx = 0;
 
     FILE* fp = popen(cmd, "r");
