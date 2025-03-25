@@ -13,6 +13,8 @@
 const float ScreenWidth = 1408;
 const float ScreenHeight = 792;
 
+const uint32_t FONT_ID_BODY_16 = 0;
+
 const Clay_Color COLOR_BLACK = (Clay_Color) { 18, 18, 18, 255 };
 const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
 const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
@@ -47,8 +49,8 @@ int main(void) {
     Clay_Initialize(mem_arena, dimension, (Clay_ErrorHandler) { HandleClayErrors });
 
     Font fonts[1];
-    fonts[0] = LoadFont("resources/Metropolis Light.ttf");
-    SetTextureFilter(fonts[0].texture, TEXTURE_FILTER_BILINEAR);
+    fonts[FONT_ID_BODY_16] = LoadFontEx("resources/Metropolis Light.ttf", 32, 0, 400);
+    SetTextureFilter(fonts[FONT_ID_BODY_16].texture, TEXTURE_FILTER_BILINEAR);
 
     SetTargetFPS(30);
 
@@ -75,8 +77,17 @@ int main(void) {
                         .childGap = 8,
                         .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(50) }
                     },
-                    .backgroundColor = COLOR_GRAY
-            }) {}
+                    .backgroundColor = COLOR_GRAY,
+                    .cornerRadius = CLAY_CORNER_RADIUS(5)
+            }) {
+                CLAY_TEXT(
+                        CLAY_STRING("Lorem Ipsum"),
+                        CLAY_TEXT_CONFIG({
+                            .fontSize = 24,
+                            .textColor = { 255,255,255,255 }
+                        })
+                );
+            }
         }
 
         Clay_RenderCommandArray render_commands = Clay_EndLayout();
