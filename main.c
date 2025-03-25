@@ -13,6 +13,10 @@
 const float ScreenWidth = 1408;
 const float ScreenHeight = 792;
 
+const Clay_Color COLOR_BLACK = (Clay_Color) { 18, 18, 18, 255 };
+const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
+const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
+
 void HandleClayErrors(Clay_ErrorData errorData) {
     printf("%s", errorData.errorText.chars);
 }
@@ -59,9 +63,22 @@ int main(void) {
                     .childGap = 16,
                     .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) }
                 },
-                .backgroundColor = {18, 18, 18, 255},
+                .backgroundColor = COLOR_BLACK,
                 .scroll = { .vertical = true }
-        }) {}
+        }) {
+
+            CLAY({
+                    .id = CLAY_ID("ClipboardItem"),
+                    .layout = {
+                        .layoutDirection = CLAY_LEFT_TO_RIGHT,
+                        .padding = { 8, 8, 8, 8 },
+                        .childGap = 8,
+                        .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(50) }
+                    },
+                    .backgroundColor = COLOR_GRAY
+            }) {}
+        }
+
         Clay_RenderCommandArray render_commands = Clay_EndLayout();
 
         BeginDrawing();
