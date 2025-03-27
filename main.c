@@ -19,6 +19,28 @@ const Clay_Color COLOR_BLACK = (Clay_Color) { 18, 18, 18, 255 };
 const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
 const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
 
+void ClipboardElement(uint8_t index, Clay_String text) {
+    CLAY({
+            .id = CLAY_IDI("ClipboardItem", index),
+            .layout = {
+                .layoutDirection = CLAY_LEFT_TO_RIGHT,
+                .padding = { 8, 8, 8, 8 },
+                .childGap = 8,
+                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(50) }
+            },
+            .backgroundColor = COLOR_GRAY,
+            .cornerRadius = CLAY_CORNER_RADIUS(5)
+    }) {
+        CLAY_TEXT(
+                text,
+                CLAY_TEXT_CONFIG({
+                    .fontSize = 24,
+                    .textColor = { 255,255,255,255 }
+                })
+        );
+    }
+}
+
 void HandleClayErrors(Clay_ErrorData errorData) {
     printf("%s", errorData.errorText.chars);
 }
@@ -51,49 +73,13 @@ int main(void) {
     Font fonts[1];
     fonts[FONT_ID_BODY_16] = LoadFontEx("resources/Metropolis Light.ttf", 32, 0, 400);
     SetTextureFilter(fonts[FONT_ID_BODY_16].texture, TEXTURE_FILTER_BILINEAR);
+    Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
 
     SetTargetFPS(30);
 
     // main app loop
     while (!WindowShouldClose()) {
         Clay_BeginLayout();
-        CLAY({
-                .id = CLAY_ID("MainContent"),
-                .layout = {
-                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                    .padding = {16, 16, 16, 16},
-                    .childGap = 16,
-                    .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) }
-                },
-                .backgroundColor = COLOR_BLACK,
-                .scroll = { .vertical = true }
-        }) {
-
-            CLAY({
-                    .id = CLAY_ID("ClipboardItem"),
-                    .layout = {
-                        .layoutDirection = CLAY_LEFT_TO_RIGHT,
-                        .padding = { 8, 8, 8, 8 },
-                        .childGap = 8,
-                        .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(50) }
-                    },
-                    .backgroundColor = COLOR_GRAY,
-                    .cornerRadius = CLAY_CORNER_RADIUS(5)
-            }) {
-                CLAY_TEXT(
-                        CLAY_STRING("Lorem Ipsum"),
-                        CLAY_TEXT_CONFIG({
-                            .fontSize = 24,
-                            .textColor = { 255,255,255,255 }
-                        })
-                );
-            }
-        }
-
-        Clay_RenderCommandArray render_commands = Clay_EndLayout();
-
-        BeginDrawing();
-        ClearBackground(YELLOW);
 
         // Retrieve data from selection and check if it already exists in clipboard
         String* new_clip_data = retrieve_selection(sel);
@@ -114,6 +100,31 @@ int main(void) {
             clipboard_append(&clipboard, new_clip_data);
 
         clipboard_print(clipboard);
+
+        CLAY({
+                .id = CLAY_ID("MainContent"),
+                .layout = {
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .padding = {16, 16, 16, 16},
+                    .childGap = 16,
+                    .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0) }
+                },
+                .backgroundColor = COLOR_BLACK,
+                .scroll = { .vertical = true }
+        }) {
+            for (size_t i = 0; i < clipboard.length; i++) {
+                Clay_String text = (Clay_String) {
+                    .length = clipboard.data[i]->length,
+                    .chars = clipboard.data[i]->chars
+                };
+                ClipboardElement(i, text);
+            }
+        }
+
+        Clay_RenderCommandArray render_commands = Clay_EndLayout();
+
+        BeginDrawing();
+        ClearBackground(YELLOW);
 
         Clay_Raylib_Render(render_commands, fonts);
         EndDrawing();
