@@ -1,4 +1,10 @@
+#define _GNU_SOURCE
+
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 
 #ifndef CLIP_H
 #define CLIP_H

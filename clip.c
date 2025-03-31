@@ -1,11 +1,3 @@
-#define _GNU_SOURCE
-
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-
 #include "clip.h"
 
 // Reallocate or die
@@ -34,7 +26,7 @@ String* copy_string(String string) {
 
 void clipboard_print(Clipboard clipboard) {
     for (size_t i = 0; i < clipboard.length;i++)
-        printf("%zu:\t%.*s\n", i, (int)clipboard.data[i]->length, clipboard.data[i]->chars);
+        printf("%zu:\t%.*s\n", i, (int)clipboard.data[i]->length + 1, clipboard.data[i]->chars);
     printf("-----------------End of clipboard;\n\n");
 }
  
