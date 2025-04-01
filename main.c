@@ -42,7 +42,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
 }
 
 void HandleClayErrors(Clay_ErrorData errorData) {
-    printf("%s", errorData.errorText.chars);
+    perror(errorData.errorText.chars);
 }
 
 int main(void) {
@@ -79,6 +79,8 @@ int main(void) {
 
     // main app loop
     while (!WindowShouldClose()) {
+
+        // Update scroll each frame
         Vector2 mousePosition = GetMousePosition();
         Vector2 mouseWheelMove = GetMouseWheelMoveV();
         Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x * 3, .y = mouseWheelMove.y * 3 };
@@ -108,7 +110,7 @@ int main(void) {
             }
         }
 
-        // If data doesn't already exist add it clipboard
+        // If data doesn't already exist, add it to the clipboard
         if (!data_exists)
             clipboard_append(&clipboard, new_clip_data);
 
