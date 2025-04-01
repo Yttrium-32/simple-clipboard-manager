@@ -26,7 +26,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
                 .layoutDirection = CLAY_LEFT_TO_RIGHT,
                 .padding = { 8, 8, 8, 8 },
                 .childGap = 8,
-                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(50) }
+                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT() }
             },
             .backgroundColor = COLOR_GRAY,
             .cornerRadius = CLAY_CORNER_RADIUS(5)
