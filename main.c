@@ -80,7 +80,8 @@ int main(void) {
     // main app loop
     while (!WindowShouldClose()) {
         Vector2 mousePosition = GetMousePosition();
-        Vector2 scrollDelta = GetMouseWheelMoveV();
+        Vector2 mouseWheelMove = GetMouseWheelMoveV();
+        Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x * 3, .y = mouseWheelMove.y * 3 };
         Clay_SetPointerState(
                 (Clay_Vector2) { mousePosition.x, mousePosition.y },
                 IsMouseButtonDown(0)
