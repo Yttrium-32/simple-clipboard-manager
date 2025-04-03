@@ -1,4 +1,8 @@
 #include "clip.h"
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // Reallocate or die
 void* xrealloc(void* ptr, size_t ptr_size) {
@@ -78,8 +82,14 @@ String* retrieve_selection(Sel sel) {
 
     FILE* fp = popen(cmd, "r");
 
+    if (!fp) {
+        int err = errno;
+        fprintf(stderr, "popen() failed with %s\n", strerror(err));
+        exit(EXIT_FAILURE);
+    }
+
     // Listen indefinitely for characters until EOF
-    int32_t ch;
+    uint32_t ch;
     while ((ch = getc(fp)) != EOF) {
         char_buf->length++;
 
@@ -88,6 +98,8 @@ String* retrieve_selection(Sel sel) {
 
         char_buf->chars[last_idx++] = ch;
     }
+
+    pclose(fp);
 
     return char_buf;
 }
