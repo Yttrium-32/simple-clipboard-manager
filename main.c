@@ -55,7 +55,7 @@ int main(void) {
         .capacity = 256
     };
 
-    Clay_Raylib_Initialize(ScreenWidth, ScreenHeight, "Simple Clipboard Manager", 0);
+    Clay_Raylib_Initialize(ScreenWidth, ScreenHeight, "Simple Clipboard Manager", FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
 
     uint64_t clay_mem_size = Clay_MinMemorySize();
     Clay_Arena mem_arena = {
@@ -79,6 +79,11 @@ int main(void) {
 
     // main app loop
     while (!WindowShouldClose()) {
+        // Update layout dimension each frame to make window responsive
+        Clay_SetLayoutDimensions((Clay_Dimensions) {
+            .width = GetScreenWidth(),
+            .height = GetScreenHeight()
+        });
 
         // Update scroll each frame
         Vector2 mousePosition = GetMousePosition();
@@ -139,7 +144,7 @@ int main(void) {
         Clay_RenderCommandArray render_commands = Clay_EndLayout();
 
         BeginDrawing();
-        ClearBackground(YELLOW);
+        ClearBackground(CLAY_COLOR_TO_RAYLIB_COLOR(COLOR_BLACK));
 
         Clay_Raylib_Render(render_commands, fonts);
         EndDrawing();
