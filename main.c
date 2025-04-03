@@ -17,27 +17,65 @@ const uint32_t FONT_ID_BODY_16 = 0;
 
 const Clay_Color COLOR_BLACK = (Clay_Color) { 18, 18, 18, 255 };
 const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
+const Clay_Color COLOR_WHITE = (Clay_Color) { 255, 255, 255, 255};
 const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
+
+Texture2D copy_button;
+Texture2D remove_button;
 
 void ClipboardElement(uint8_t index, Clay_String text) {
     CLAY({
             .id = CLAY_IDI("ClipboardItem", index),
+            .backgroundColor = COLOR_GRAY,
+            .cornerRadius = CLAY_CORNER_RADIUS(5),
             .layout = {
                 .layoutDirection = CLAY_LEFT_TO_RIGHT,
                 .padding = { 8, 8, 8, 8 },
                 .childGap = 8,
-                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT() }
-            },
-            .backgroundColor = COLOR_GRAY,
-            .cornerRadius = CLAY_CORNER_RADIUS(5)
+                .sizing = { .width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIT(0) }
+            }
     }) {
+        CLAY({
+                .id = CLAY_IDI("TextItem", index),
+                .backgroundColor = COLOR_GRAY,
+                .layout = {
+                    .sizing = { .width = CLAY_SIZING_GROW(0) }
+                }
+        })
         CLAY_TEXT(
                 text,
                 CLAY_TEXT_CONFIG({
                     .fontSize = 24,
-                    .textColor = { 255,255,255,255 }
+                    .textColor = COLOR_WHITE
                 })
         );
+        CLAY({
+                .id = CLAY_IDI("Buttons", index),
+                .backgroundColor = COLOR_GRAY,
+                .layout = {
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
+                    .padding = { 8, 8, 8, 8 },
+                    .childGap = 8,
+                    .sizing = { .width = CLAY_SIZING_FIT(0), .height = CLAY_SIZING_GROW(0) }
+                }
+        }) {
+            CLAY({
+                    .id = CLAY_IDI("CopyButton", index),
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(24), .height = CLAY_SIZING_FIXED(24)} },
+                    .image = {
+                        .imageData = &copy_button,
+                        .sourceDimensions = { 120, 120 }
+                    }
+            }){}
+            CLAY({
+                    .id = CLAY_IDI("RemoveButton", index),
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(24), .height = CLAY_SIZING_FIXED(24)} },
+                    .image = {
+                        .imageData = &remove_button,
+                        .sourceDimensions = { 120, 120 }
+                    }
+            }){}
+        }
     }
 }
 
@@ -75,7 +113,8 @@ int main(void) {
     SetTextureFilter(fonts[FONT_ID_BODY_16].texture, TEXTURE_FILTER_BILINEAR);
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
 
-    SetTargetFPS(30);
+    copy_button = LoadTexture("resources/copy.png");
+    remove_button = LoadTexture("resources/remove.png");
 
     // main app loop
     while (!WindowShouldClose()) {
@@ -88,7 +127,7 @@ int main(void) {
         // Update scroll each frame
         Vector2 mousePosition = GetMousePosition();
         Vector2 mouseWheelMove = GetMouseWheelMoveV();
-        Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x * 3, .y = mouseWheelMove.y * 3 };
+        Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x, .y = mouseWheelMove.y };
         Clay_SetPointerState(
                 (Clay_Vector2) { mousePosition.x, mousePosition.y },
                 IsMouseButtonDown(0)
