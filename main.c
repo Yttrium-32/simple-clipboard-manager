@@ -10,8 +10,8 @@
 #include "clay.h"
 #include "raylib/clay_renderer_raylib.c"
 
-const float ScreenWidth = 1408;
-const float ScreenHeight = 792;
+const float screen_width = 1408;
+const float screen_height = 792;
 
 const uint32_t FONT_ID_BODY_16 = 0;
 
@@ -61,7 +61,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
         }) {
             CLAY({
                     .id = CLAY_IDI("CopyButton", index),
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(24), .height = CLAY_SIZING_FIXED(24)} },
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
                     .image = {
                         .imageData = &copy_button,
                         .sourceDimensions = { 120, 120 }
@@ -69,7 +69,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
             }){}
             CLAY({
                     .id = CLAY_IDI("RemoveButton", index),
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(24), .height = CLAY_SIZING_FIXED(24)} },
+                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
                     .image = {
                         .imageData = &remove_button,
                         .sourceDimensions = { 120, 120 }
@@ -79,7 +79,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
     }
 }
 
-void HandleClayErrors(Clay_ErrorData errorData) {
+void handle_clay_errors(Clay_ErrorData errorData) {
     perror(errorData.errorText.chars);
 }
 
@@ -93,7 +93,7 @@ int main(void) {
         .capacity = 256
     };
 
-    Clay_Raylib_Initialize(ScreenWidth, ScreenHeight, "Simple Clipboard Manager", FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+    Clay_Raylib_Initialize(screen_width, screen_height, "Simple Clipboard Manager", FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
 
     uint64_t clay_mem_size = Clay_MinMemorySize();
     Clay_Arena mem_arena = {
@@ -102,11 +102,11 @@ int main(void) {
     };
 
     Clay_Dimensions dimension = {
-        .width = ScreenWidth,
-        .height = ScreenHeight
+        .width = screen_width,
+        .height = screen_height
     };
 
-    Clay_Initialize(mem_arena, dimension, (Clay_ErrorHandler) { HandleClayErrors });
+    Clay_Initialize(mem_arena, dimension, (Clay_ErrorHandler) { handle_clay_errors });
 
     Font fonts[1];
     fonts[FONT_ID_BODY_16] = LoadFontEx("resources/Metropolis Light.ttf", 32, 0, 400);
@@ -127,7 +127,7 @@ int main(void) {
         // Update scroll each frame
         Vector2 mousePosition = GetMousePosition();
         Vector2 mouseWheelMove = GetMouseWheelMoveV();
-        Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x, .y = mouseWheelMove.y };
+        Vector2 scrollDelta = (Vector2) { .x = mouseWheelMove.x * 3, .y = mouseWheelMove.y * 3 };
         Clay_SetPointerState(
                 (Clay_Vector2) { mousePosition.x, mousePosition.y },
                 IsMouseButtonDown(0)
