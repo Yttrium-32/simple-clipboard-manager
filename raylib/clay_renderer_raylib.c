@@ -91,8 +91,11 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     float textHeight = config->fontSize;
     Font* fonts = (Font*)userData;
     Font fontToUse = fonts[config->fontId];
-    // Font failed to load, likely the fonts are in the wrong place relative to the execution dir
-    if (!fontToUse.glyphs) return textSize;
+    // Font failed to load, likely the fonts are in the wrong place relative to the execution dir.
+    // RayLib ships with a default font, so we can continue with that built in one. 
+    if (!fontToUse.glyphs) {
+        fontToUse = GetFontDefault();
+    }
 
     float scaleFactor = config->fontSize/(float)fontToUse.baseSize;
 
@@ -122,6 +125,21 @@ void Clay_Raylib_Initialize(int width, int height, const char *title, unsigned i
 //    EnableEventWaiting();
 }
 
+// A MALLOC'd buffer, that we keep modifying inorder to save from so many Malloc and Free Calls.
+// Call Clay_Raylib_Close() to free
+static char *temp_render_buffer = NULL;
+static int temp_render_buffer_len = 0;
+
+// Call after closing the window to clean up the render buffer
+void Clay_Raylib_Close()
+{
+    if(temp_render_buffer) free(temp_render_buffer);
+    temp_render_buffer_len = 0;
+
+    CloseWindow();
+}
+
+
 void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
 {
     for (int j = 0; j < renderCommands.length; j++)
@@ -131,14 +149,23 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
         switch (renderCommand->commandType)
         {
             case CLAY_RENDER_COMMAND_TYPE_TEXT: {
-                // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
                 Clay_TextRenderData *textData = &renderCommand->renderData.text;
-                char *cloned = (char *)malloc(textData->stringContents.length + 1);
-                memcpy(cloned, textData->stringContents.chars, textData->stringContents.length);
-                cloned[textData->stringContents.length] = '\0';
                 Font fontToUse = fonts[textData->fontId];
-                DrawTextEx(fontToUse, cloned, (Vector2){boundingBox.x, boundingBox.y}, (float)textData->fontSize, (float)textData->letterSpacing, CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor));
-                free(cloned);
+    
+                int strlen = textData->stringContents.length + 1;
+    
+                if(strlen > temp_render_buffer_len) {
+                    // Grow the temp buffer if we need a larger string
+                    if(temp_render_buffer) free(temp_render_buffer);
+                    temp_render_buffer = malloc(strlen);
+                    temp_render_buffer_len = strlen;
+                }
+    
+                // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
+                memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
+                temp_render_buffer[textData->stringContents.length] = '\0';
+                DrawTextEx(fontToUse, temp_render_buffer, (Vector2){boundingBox.x, boundingBox.y}, (float)textData->fontSize, (float)textData->letterSpacing, CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor));
+    
                 break;
             }
             case CLAY_RENDER_COMMAND_TYPE_IMAGE: {

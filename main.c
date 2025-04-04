@@ -188,6 +188,6 @@ int main(void) {
         Clay_Raylib_Render(render_commands, fonts);
         EndDrawing();
     }
-    return 0;
+    Clay_Raylib_Close();
 }
 
