@@ -17,11 +17,18 @@ const uint32_t FONT_ID_BODY_16 = 0;
 
 const Clay_Color COLOR_BLACK = (Clay_Color) { 18, 18, 18, 255 };
 const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
+const Clay_Color COLOR_LIGHT_GRAY = (Clay_Color) { 87, 87, 87, 255 };
 const Clay_Color COLOR_WHITE = (Clay_Color) { 255, 255, 255, 255};
 const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
 
 Texture2D copy_button;
 Texture2D remove_button;
+
+void example_button_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
+    if (pointer.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME) {
+        printf("Button pressed!\n");
+    }
+}
 
 void ClipboardElement(uint8_t index, Clay_String text) {
     CLAY({
@@ -60,21 +67,43 @@ void ClipboardElement(uint8_t index, Clay_String text) {
                 }
         }) {
             CLAY({
-                    .id = CLAY_IDI("CopyButton", index),
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
-                    .image = {
-                        .imageData = &copy_button,
-                        .sourceDimensions = { 120, 120 }
-                    }
-            }){}
+                    .id = CLAY_IDI("CopyButtonBox", index),
+                    .layout = {
+                        .sizing = { .width = CLAY_SIZING_FIT(0), .height = CLAY_SIZING_FIT(0)},
+                        .padding = { 4, 4, 4, 4 },
+                    },
+                    .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
+                    .cornerRadius = CLAY_CORNER_RADIUS(5),
+            }) {
+                Clay_OnHover(example_button_handler, (intptr_t)0);
+                CLAY({
+                        .id = CLAY_IDI("CopyButton", index),
+                        .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
+                        .image = {
+                            .imageData = &copy_button,
+                            .sourceDimensions = { 120, 120 }
+                        }
+                        }){}
+            }
             CLAY({
-                    .id = CLAY_IDI("RemoveButton", index),
-                    .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
-                    .image = {
+                    .id = CLAY_IDI("RemoveButtonBox", index),
+                    .layout = {
+                        .sizing = { .width = CLAY_SIZING_FIT(0), .height = CLAY_SIZING_FIT(0)},
+                        .padding = { 4, 4, 4, 4 },
+                    },
+                    .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
+                    .cornerRadius = CLAY_CORNER_RADIUS(5),
+            }) {
+                Clay_OnHover(example_button_handler, (intptr_t)0);
+                CLAY({
+                        .id = CLAY_IDI("RemoveButton", index),
+                        .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
+                        .image = {
                         .imageData = &remove_button,
                         .sourceDimensions = { 120, 120 }
-                    }
-            }){}
+                        }
+                        }){}
+            }
         }
     }
 }
