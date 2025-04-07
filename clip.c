@@ -1,8 +1,9 @@
-#include "clip.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "clip.h"
 
 // Reallocate or die
 void* xrealloc(void* ptr, size_t ptr_size) {
@@ -13,6 +14,13 @@ void* xrealloc(void* ptr, size_t ptr_size) {
         exit(EXIT_FAILURE);
     } else
         return tmp;
+}
+
+void free_string(String** str_pointer) {
+    if (str_pointer && *str_pointer) {
+        free((*str_pointer)->chars);
+        free(*str_pointer);
+    }
 }
 
 String* copy_string(String string) {

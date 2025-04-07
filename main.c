@@ -141,7 +141,7 @@ int main(void) {
         Clay_BeginLayout();
 
         // Retrieve data from selection and check if it already exists in clipboard
-        String* new_clip_data = retrieve_selection(sel);
+        String* new_clip_data __attribute__((__cleanup__(free_string))) = retrieve_selection(sel);
 
         bool data_exists = false;
         for (size_t i = 0; i < clipboard.length; i++ ) {
@@ -158,7 +158,7 @@ int main(void) {
         if (!data_exists)
             clipboard_append(&clipboard, new_clip_data);
 
-        clipboard_print(clipboard);
+        /*clipboard_print(clipboard);*/
 
         CLAY({
                 .id = CLAY_ID("MainContent"),

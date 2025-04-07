@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,5 +32,7 @@ void write_selection(Sel sel, const char* str);
 int clipboard_append(Clipboard* clipboard, String* data);
 String* clipboard_get(Clipboard clipboard, size_t index);
 void clipboard_print(Clipboard clipboard);
+
+void free_string(String** str_pointer);
 
 #endif // CLIP_H
