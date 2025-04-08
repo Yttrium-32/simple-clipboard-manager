@@ -200,10 +200,11 @@ int main(void) {
                 .backgroundColor = COLOR_BLACK,
                 .scroll = { .vertical = true }
         }) {
-            for (size_t i = 0; i < clipboard.length; i++) {
+            for (size_t i = clipboard.length - 1; i > 0; i--) {
+                String* _text = clipboard_get(clipboard, i);
                 Clay_String text = (Clay_String) {
-                    .length = clipboard.data[i]->length,
-                    .chars = clipboard.data[i]->chars
+                    .length = _text->length,
+                    .chars = _text->chars
                 };
                 ClipboardElement(i, text);
             }
