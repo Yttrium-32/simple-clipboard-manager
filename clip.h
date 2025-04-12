@@ -13,6 +13,8 @@ typedef enum {
     CLIPBOARD
 } Sel;
 
+typedef void (*ButtonCallback)(void);
+
 typedef struct {
     char* chars;
     size_t length;

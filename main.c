@@ -24,10 +24,20 @@ const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
 Texture2D copy_button;
 Texture2D remove_button;
 
-void example_button_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
+void button_action_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
     if (pointer.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME) {
-        printf("Button pressed!\n");
+        ButtonCallback callback_func = (ButtonCallback)user_data;
+        printf("INFO: Button pressed, calling appropriate callback!\n");
+        if (callback_func) callback_func();
     }
+}
+
+void remove_button_handler() {
+    printf("INFO: CALLBACK: Remove callback invoked!\n");
+}
+
+void copy_button_handler() {
+    printf("INFO: CALLBACK: Copy callback invoked!\n");
 }
 
 void ClipboardElement(uint8_t index, Clay_String text) {
@@ -75,7 +85,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
                     .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
                     .cornerRadius = CLAY_CORNER_RADIUS(5),
             }) {
-                Clay_OnHover(example_button_handler, (intptr_t)0);
+                Clay_OnHover(button_action_handler, (intptr_t)copy_button_handler);
                 CLAY({
                         .id = CLAY_IDI("CopyButton", index),
                         .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
@@ -94,7 +104,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
                     .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
                     .cornerRadius = CLAY_CORNER_RADIUS(5),
             }) {
-                Clay_OnHover(example_button_handler, (intptr_t)0);
+                Clay_OnHover(button_action_handler, (intptr_t)remove_button_handler);
                 CLAY({
                         .id = CLAY_IDI("RemoveButton", index),
                         .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
