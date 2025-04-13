@@ -33,14 +33,32 @@ void button_action_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t 
 }
 
 void remove_button_handler() {
-    printf("INFO: CALLBACK: Remove callback invoked!\n");
+    printf("INFO: Remove callback invoked\n");
 }
 
-void copy_button_handler() {
-    printf("INFO: CALLBACK: Copy callback invoked!\n");
+void copy_button_handler(Clay_ElementId _, Clay_PointerData mouse_pointer, intptr_t user_data) {
+    if (mouse_pointer.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME) {
+        ClipboardInfo *clipboard_info = (ClipboardInfo*)user_data;
+        printf("INFO: Copy to clipboard invoked\n");
+        printf("INFO: sel = %d\n", clipboard_info->sel);
+        printf("INFO: _text = %.*s\n", (int)clipboard_info->text.length, clipboard_info->text.chars);
+
+        write_selection(clipboard_info->sel, clipboard_info->text);
+    }
 }
 
-void ClipboardElement(uint8_t index, Clay_String text) {
+void ClipboardElement(uint8_t index, Sel sel, String _text) {
+    Clay_String text = (Clay_String) {
+        .length = _text.length,
+        .chars = _text.chars
+    };
+
+    ClipboardInfo *clip_info_ptr = (ClipboardInfo*)malloc(sizeof(ClipboardInfo));
+    *clip_info_ptr = (ClipboardInfo) {
+        .sel = sel,
+        .text = _text
+    };
+
     CLAY({
             .id = CLAY_IDI("ClipboardItem", index),
             .backgroundColor = COLOR_GRAY,
@@ -85,7 +103,7 @@ void ClipboardElement(uint8_t index, Clay_String text) {
                     .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
                     .cornerRadius = CLAY_CORNER_RADIUS(5),
             }) {
-                Clay_OnHover(button_action_handler, (intptr_t)copy_button_handler);
+                Clay_OnHover(copy_button_handler, (intptr_t)clip_info_ptr);
                 CLAY({
                         .id = CLAY_IDI("CopyButton", index),
                         .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
@@ -212,11 +230,7 @@ int main(void) {
         }) {
             for (size_t i = clipboard.length - 1; i > 0; i--) {
                 String* _text = clipboard_get(clipboard, i);
-                Clay_String text = (Clay_String) {
-                    .length = _text->length,
-                    .chars = _text->chars
-                };
-                ClipboardElement(i, text);
+                ClipboardElement(i, sel, *_text);
             }
         }
 

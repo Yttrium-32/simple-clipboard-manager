@@ -26,6 +26,11 @@ typedef struct {
     size_t capacity;
 } Clipboard;
 
+typedef struct {
+    Sel sel;
+    String text;
+} ClipboardInfo;
+
 void* xrealloc(void* ptr, size_t ptr_size);
 
 String* retrieve_selection(Sel sel);
