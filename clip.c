@@ -1,7 +1,10 @@
-#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 #include "clip.h"
 
@@ -92,7 +95,7 @@ String* retrieve_selection(Sel sel) {
 
     if (!fp) {
         int err = errno;
-        fprintf(stderr, "popen() failed with %s\n", strerror(err));
+        fprintf(stderr, "ERR: popen() failed with %s\n", strerror(err));
         exit(EXIT_FAILURE);
     }
 
@@ -112,23 +115,54 @@ String* retrieve_selection(Sel sel) {
     return char_buf;
 }
 
-void write_selection(Sel sel, const char* str) {
-    char* cmd;
+void write_selection(Sel sel, String str) {
+    char* sel_str_arr[] = {"primary", "secondary", "clipboard"};
+    const char* selection = sel_str_arr[sel];
 
-    switch (sel) {
-        case PRIMARY:
-            asprintf(&cmd, "echo -n %s | xclip -selection p", str);
-            break;
-        case SECONDARY:
-            asprintf(&cmd, "echo -n %s | xclip -selection s", str);
-            break;
-        case CLIPBOARD:
-        default:
-            asprintf(&cmd, "echo -n %s | xclip -selection c", str);
+    int32_t fildes[2];
+    if (pipe(fildes) == -1) {
+        int32_t err = errno;
+        fprintf(stderr, "ERR: pipe failed with: %s\n", strerror(err));
+        return;
     }
 
-    if (system(cmd) != 0) {
-        perror("Write to selection failed!");
-    };
+    switch (fork()) {
+        case -1: {
+            int32_t err = errno;
+            fprintf(stderr, "ERR: fork failed with: %s\n", strerror(err));
+            close(fildes[0]);
+            close(fildes[1]);
+            return;
+        }
+        case 0: {
+            close(fildes[1]);
+            dup2(fildes[0], STDIN_FILENO);
+            close(fildes[0]);
+            execlp("xclip", "xclip", "-selection", selection, NULL);
+
+            int32_t err = errno;
+            fprintf(stderr, "ERR: execlp failed with: %s\n", strerror(err));
+            _exit(127);
+        }
+
+        default: {
+            close(fildes[0]);
+
+            if (write(fildes[1], str.chars, str.length) < 0) {
+                int32_t err = errno;
+                fprintf(stderr, "ERR: write failed with: %s\n", strerror(err));
+            }
+
+            close(fildes[1]);
+            int32_t status;
+            if (wait(&status) == -1) {
+                int32_t err = errno;
+                fprintf(stderr, "ERR wait failed with: %s\n", strerror(err));
+            } else if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
+                fprintf(stderr, "ERR: xclip exited with code %d\n", WEXITSTATUS(status));
+            }
+            break;
+        }
+    }
 }
 
