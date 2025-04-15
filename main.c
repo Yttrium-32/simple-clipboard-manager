@@ -10,8 +10,6 @@
 #include "clay.h"
 #include "raylib/clay_renderer_raylib.c"
 
-#define CLIP_SIZE 256
-
 const float screen_width = 1408;
 const float screen_height = 792;
 
@@ -49,7 +47,7 @@ void copy_button_handler(Clay_ElementId _, Clay_PointerData mouse_pointer, intpt
     }
 }
 
-void ClipboardListItem(uint8_t index, Sel sel, String _text) {
+void ClipboardElement(uint8_t index, Sel sel, String _text) {
     Clay_String text = (Clay_String) {
         .length = _text.length,
         .chars = _text.chars
@@ -145,11 +143,11 @@ void handle_clay_errors(Clay_ErrorData errorData) {
 int main(void) {
     Sel sel = CLIPBOARD;
 
-    ClipboardElement clip_buffer[CLIP_SIZE] = {NULL};
-    ClipboardList clipboard = {
-        .data_list = clip_buffer,
+    String* clip_buffer[256] = {NULL};
+    Clipboard clipboard = {
+        .data = clip_buffer,
         .length = 0,
-        .capacity = CLIP_SIZE
+        .capacity = 256
     };
 
     Clay_Raylib_Initialize(screen_width, screen_height, "Simple Clipboard Manager", FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
@@ -232,7 +230,7 @@ int main(void) {
         }) {
             for (size_t i = clipboard.length - 1; i > 0; i--) {
                 String* _text = clipboard_get(clipboard, i);
-                ClipboardListItem(i, sel, *_text);
+                ClipboardElement(i, sel, *_text);
             }
         }
 

@@ -39,32 +39,30 @@ String* copy_string(String string) {
     return new_string;
 }
 
-void clipboard_print(ClipboardList clipboard) {
-    for (size_t i = 0; i < clipboard.length; i++) {
-        ClipboardElement item = clipboard.data_list[i];
-        printf("%zu:\t%.*s\n", i, (int)item.data->length, item.data->chars);
-    }
-
+void clipboard_print(Clipboard clipboard) {
+    for (size_t i = 0; i < clipboard.length;i++)
+        printf("%zu:\t%.*s\n", i, (int)clipboard.data[i]->length + 1, clipboard.data[i]->chars);
     printf("-----------------End of clipboard;\n\n");
 }
  
-int clipboard_append(ClipboardList* clipboard, String* data) {
+int clipboard_append(Clipboard* clipboard, String* data) {
     if (clipboard->length >= clipboard->capacity) {
         for (size_t i = 0; i < clipboard->capacity - 1; i++)
-            clipboard->data_list[i].data = clipboard_get(*clipboard, i + 1);
+            clipboard->data[i] = clipboard_get(*clipboard, i + 1);
 
-        clipboard->data_list[clipboard->length - 1].data = copy_string(*data);
+        clipboard->data[clipboard->length - 1] = copy_string(*data);
         return 0;
     }
 
-    clipboard->data_list[clipboard->length].data = copy_string(*data);
+    clipboard->data[clipboard->length] = copy_string(*data);
     clipboard->length++;
     return 0;
 }
 
-String* clipboard_get(ClipboardList clipboard, size_t index) {
-    if (index >= 0 && index < clipboard.length)
-        return clipboard.data_list[index].data;
+String* clipboard_get(Clipboard clipboard, size_t index) {
+    if (index >= 0 && index < clipboard.length) {
+        return clipboard.data[index];
+    }
 
     raise(SIGTRAP);
     return (String*)NULL;
