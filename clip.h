@@ -38,6 +38,7 @@ String* retrieve_selection(Sel sel);
 void write_selection(Sel sel, String str);
 
 int clipboard_append(Clipboard* clipboard, String* data);
+void clipboard_remove(Clipboard* clipboard, size_t index);
 String* clipboard_get(Clipboard clipboard, size_t index);
 void clipboard_print(Clipboard clipboard);
 

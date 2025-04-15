@@ -59,6 +59,16 @@ int clipboard_append(Clipboard* clipboard, String* data) {
     return 0;
 }
 
+void clipboard_remove(Clipboard* clipboard, size_t index) {
+    if (index >= 0 && index < clipboard->length) {
+        for (size_t i = index; i < clipboard->length - 1; i++)
+            clipboard->data[i] = clipboard_get(*clipboard, i + 1);
+
+        clipboard->data[clipboard->length - 1] = (String*)NULL;
+        clipboard->length--;
+    }
+}
+
 String* clipboard_get(Clipboard clipboard, size_t index) {
     if (index >= 0 && index < clipboard.length) {
         return clipboard.data[index];

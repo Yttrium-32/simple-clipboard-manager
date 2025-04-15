@@ -29,14 +29,16 @@ Clipboard clipboard = {
     .capacity = CLIP_SIZE
 };
 
-
 Texture2D copy_button;
 Texture2D remove_button;
 
 void remove_button_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
     if (pointer.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME) {
         ClipboardInfo *clipboard_info = (ClipboardInfo*)user_data;
-        printf("INFO: Removing element: %d\n", clipboard_info->cur_idx);
+        uint32_t idx = clipboard_info->cur_idx;
+        printf("INFO: Removing element: %d\n", idx);
+
+        clipboard_remove(&clipboard, idx - 1);
     }
 }
 
