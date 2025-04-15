@@ -33,16 +33,11 @@ Clipboard clipboard = {
 Texture2D copy_button;
 Texture2D remove_button;
 
-void button_action_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
+void remove_button_handler(Clay_ElementId _, Clay_PointerData pointer, intptr_t user_data) {
     if (pointer.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME) {
-        ButtonCallback callback_func = (ButtonCallback)user_data;
-        printf("INFO: Button pressed, calling appropriate callback!\n");
-        if (callback_func) callback_func();
+        ClipboardInfo *clipboard_info = (ClipboardInfo*)user_data;
+        printf("INFO: Removing element: %d\n", clipboard_info->cur_idx);
     }
-}
-
-void remove_button_handler() {
-    printf("INFO: Remove callback invoked\n");
 }
 
 void copy_button_handler(Clay_ElementId _, Clay_PointerData mouse_pointer, intptr_t user_data) {
@@ -132,7 +127,7 @@ void ClipboardElement(uint8_t index, Sel sel, String _text) {
                     .backgroundColor = Clay_Hovered() ? COLOR_LIGHT_GRAY : COLOR_GRAY,
                     .cornerRadius = CLAY_CORNER_RADIUS(5),
             }) {
-                Clay_OnHover(button_action_handler, (intptr_t)remove_button_handler);
+                Clay_OnHover(remove_button_handler, (intptr_t)clip_info_ptr);
                 CLAY({
                         .id = CLAY_IDI("RemoveButton", index),
                         .layout = { .sizing = { .width = CLAY_SIZING_FIXED(36), .height = CLAY_SIZING_FIXED(36)} },
