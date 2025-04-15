@@ -21,10 +21,16 @@ typedef struct {
 } String;
 
 typedef struct {
-    String** data;
+    String* data;
+    uint32_t id;
+} ClipboardElement;
+
+typedef struct {
+    ClipboardElement* data_list;
     size_t length;
     size_t capacity;
-} Clipboard;
+} ClipboardList;
+
 
 typedef struct {
     Sel sel;
@@ -36,9 +42,9 @@ void* xrealloc(void* ptr, size_t ptr_size);
 String* retrieve_selection(Sel sel);
 void write_selection(Sel sel, String str);
 
-int clipboard_append(Clipboard* clipboard, String* data);
-String* clipboard_get(Clipboard clipboard, size_t index);
-void clipboard_print(Clipboard clipboard);
+int clipboard_append(ClipboardList* clipboard, String* data);
+String* clipboard_get(ClipboardList clipboard, size_t index);
+void clipboard_print(ClipboardList clipboard);
 
 void free_string(String** str_pointer);
 
