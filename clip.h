@@ -29,6 +29,7 @@ typedef struct {
 typedef struct {
     Sel sel;
     String text;
+    uint32_t cur_idx;
 } ClipboardInfo;
 
 void* xrealloc(void* ptr, size_t ptr_size);

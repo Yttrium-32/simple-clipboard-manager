@@ -65,7 +65,8 @@ void ClipboardElement(uint8_t index, Sel sel, String _text) {
     ClipboardInfo *clip_info_ptr = (ClipboardInfo*)malloc(sizeof(ClipboardInfo));
     *clip_info_ptr = (ClipboardInfo) {
         .sel = sel,
-        .text = _text
+        .text = _text,
+        .cur_idx = index
     };
 
     CLAY({
