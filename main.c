@@ -10,6 +10,8 @@
 #include "clay.h"
 #include "raylib/clay_renderer_raylib.c"
 
+#define CLIP_SIZE 256
+
 const float screen_width = 1408;
 const float screen_height = 792;
 
@@ -20,6 +22,13 @@ const Clay_Color COLOR_GRAY = (Clay_Color) { 63, 63, 63, 255 };
 const Clay_Color COLOR_LIGHT_GRAY = (Clay_Color) { 87, 87, 87, 255 };
 const Clay_Color COLOR_WHITE = (Clay_Color) { 255, 255, 255, 255};
 const Clay_Color COLOR_PURPLE = (Clay_Color) { 208, 170, 218, 255 };
+
+Clipboard clipboard = {
+    .data = (String*[CLIP_SIZE]){NULL},
+    .length = 0,
+    .capacity = CLIP_SIZE
+};
+
 
 Texture2D copy_button;
 Texture2D remove_button;
@@ -142,13 +151,6 @@ void handle_clay_errors(Clay_ErrorData errorData) {
 
 int main(void) {
     Sel sel = CLIPBOARD;
-
-    String* clip_buffer[256] = {NULL};
-    Clipboard clipboard = {
-        .data = clip_buffer,
-        .length = 0,
-        .capacity = 256
-    };
 
     Clay_Raylib_Initialize(screen_width, screen_height, "Simple Clipboard Manager", FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
 
