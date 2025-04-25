@@ -4,7 +4,7 @@ layout library [`Clay`](https://github.com/nicbarker/clay) for Linux.
 Relies on `xclip` to modify system clipboard.
 
 ## Build instructions
-Ensure `xclip`, `cmake`, `bear` and `gcc` are setup on your system
+Ensure `xclip`, `cmake` and `gcc` are setup on your system
 
 - Build:
     ```
